@@ -1,20 +1,16 @@
 import datetime
-import json
 import os
-import re
 
 import discord
-import requests
 from bs4 import BeautifulSoup
+from discord.ext import commands
+
+import ehapi
 
 DISCORD_TOKEN = os.environ['DISCORD_TOKEN']
-client = discord.Client()
+description = "Grab E-Hentai metadata for E-Hentai links in the chat."
+bot = commands.Bot(command_prefix='!', description=description)
 
-page_token = re.compile('https?:\/\/e[\-x]hentai\.org\/s\/([\da-f]{10})\/(\d+)\-(\d+)')
-gallery_token = re.compile('https?:\/\/e[\-x]hentai\.org\/(?:g|mpv)\/(\d+)\/([\da-f]{10})')
-set_topic_re = re.compile('^!topic (.*)$')
-
-EH_API = "https://e-hentai.org/api.php"
 G_CATEGORY = {"Doujinshi": "https://a.safe.moe/4JVyo.png",
               "Manga": "https://a.safe.moe/Uy5AH.png",
               "Artist CG Sets": "https://a.safe.moe/GCLdI.png",
@@ -28,75 +24,51 @@ G_CATEGORY = {"Doujinshi": "https://a.safe.moe/4JVyo.png",
 EH_COLOUR = discord.Colour(0x660611)
 
 
-@client.event
+@bot.event
+async def on_ready():
+    print("Logged in as")
+    print(bot.user.name)
+    print(bot.user.id)
+    print("------")
+
+
+@bot.event
 async def on_message(message):
-    gids = get_gids(message.content)
-    for token_group in divide_chunks(gids):
-        galleries = gallery_api(token_group)
-        if galleries:
-            logger(message, ", ".join([gallery['title'] for gallery in galleries]))
-            if len(gids) > 5:  # don't spam chat too much if user spams links
-                await client.send_message(message.channel, embed=titles_only(galleries))
-            else:
-                for ex_metadata in galleries:
-                    await client.send_message(message.channel, embed=construct_embed(ex_metadata))
-    new_topic = set_topic(message)
-    if new_topic:
-        await client.edit_channel(message.channel, topic=new_topic[0])
+    await parse_exlinks(message)
+    await bot.process_commands(message)
 
 
-# get the gids and hashes of every EH url posted in a message
-def get_gids(message):
-    gallery_results = []
-    page_results = page_token.findall(message)
-    # fix up ordering and types before querying EH
-    remapped_results = [[int(elem[1]), elem[0], int(elem[2])] for elem in page_results]
-    # divide into chunks of max 25 requests per POST to EH
-    for token_group in divide_chunks(remapped_results):
-        gallery_results += page_api(token_group)
-    gallery_results += [[int(elem[0]), elem[1]] for elem in gallery_token.findall(message)]
-    return gallery_results
+# set topic for sadpanda server
+@bot.command(pass_context=True)
+async def topic(ctx, *, new_topic: str):
+    if ctx.message.server.id is "269723851389272065" or "253229838788198400":
+        if ctx.message.channel.permissions_for(ctx.message.server.me).manage_channels:
+            await bot.edit_channel(ctx.message.channel, topic=new_topic)
 
 
-# Divide lists into chunks of 25 since EH only allows a max of 25 urls per POST request
-def divide_chunks(original_chunk):
-    return [original_chunk[i:i + 25] for i in range(0, len(original_chunk), 25)]
-
-
-# Query the EH api for gid from a gallery page url
-def page_api(token_group):
-    payload = {"method": "gtoken", "pagelist": token_group}
-    r = requests.post(EH_API, data=json.dumps(payload))
-    return [[elem['gid'], elem['token']] for elem in r.json()['tokenlist']]
-
-
-# Query the EH api for metadata from a gallery
-def gallery_api(token_group):
-    payload = {"method": "gdata", "gidlist": token_group, "namespace": 1}
-    r = requests.post(EH_API, data=json.dumps(payload))
-    return r.json()['gmetadata']
+# search for EH links and post their metadata
+async def parse_exlinks(message):
+    galleries = ehapi.get_galleries(message.content)
+    if galleries:
+        logger(message, ", ".join([gallery['token'] for gallery in galleries]))
+        if len(galleries) > 5:  # don't spam chat too much if user spams links
+            await bot.send_message(message.channel, embed=embed_titles(galleries))
+        else:
+            for gallery in galleries:
+                await bot.send_message(message.channel, embed=embed_full(gallery))
 
 
 # string of titles for lots of links
-def titles_only(exmetas):
-    link_list = [create_markdown_url(exmeta['title'], create_ex_url(exmeta['gid'], exmeta['token'])) for exmeta in exmetas]
+def embed_titles(exmetas):
+    link_list = [create_markdown_url(exmeta['title'], create_ex_url(exmeta['gid'], exmeta['token'])) for exmeta in
+                 exmetas]
     msg = "\n".join(link_list)
     return discord.Embed(description=msg,
                          colour=EH_COLOUR)
 
 
-# make a markdown hyperlink
-def create_markdown_url(message, url):
-    return "[" + BeautifulSoup(message, "html.parser").string + "](" + url + ")"
-
-
-# make a EH url from it's gid and token
-def create_ex_url(gid, g_token):
-    return "https://exhentai.org/g/" + str(gid) + "/" + g_token + "/"
-
-
 # pretty discord embeds for small amount of links
-def construct_embed(exmeta):
+def embed_full(exmeta):
     em = discord.Embed(title=BeautifulSoup(exmeta['title'], "html.parser").string,
                        url=create_ex_url(exmeta['gid'], exmeta['token']),
                        timestamp=datetime.datetime.utcfromtimestamp(int(exmeta['posted'])),
@@ -132,22 +104,25 @@ def process_tags(em, tags):
     return em
 
 
-# set topic for the sadpanda server (and test server)
-def set_topic(message):
-    if message.server.id is "269723851389272065" or "253229838788198400":
-        if message.channel.permissions_for(message.server.me).manage_channels:
-            return set_topic_re.findall(message.content)
-    return []
+# make a markdown hyperlink
+def create_markdown_url(message, url):
+    return "[" + BeautifulSoup(message, "html.parser").string + "](" + url + ")"
 
 
+# make a EH url from it's gid and token
+def create_ex_url(gid, g_token):
+    return "https://exhentai.org/g/" + str(gid) + "/" + g_token + "/"
+
+
+# crude, but using Docker so ¯\_(ツ)_/¯
 def logger(message, contents):
     print(message.author.name + " @ " + message.server.name + " @ " + str(message.timestamp))
     print(contents)
-    print("-----")
+    print("------")
 
 
 def main():
-    client.run(DISCORD_TOKEN)
+    bot.run(DISCORD_TOKEN)
 
 
 if __name__ == "__main__":
