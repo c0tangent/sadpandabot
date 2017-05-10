@@ -5,7 +5,7 @@ import requests
 
 page_token = re.compile('https?:\/\/e[\-x]hentai\.org\/s\/([\da-f]{10})\/(\d+)\-(\d+)')
 gallery_token = re.compile('https?:\/\/e[\-x]hentai\.org\/(?:g|mpv)\/(\d+)\/([\da-f]{10})')
-EH_API = "https://e-hentai.org/api.php"
+EH_API = "https://api.e-hentai.org/api.php"
 
 
 # extract all exurls from a string and get the metadata
