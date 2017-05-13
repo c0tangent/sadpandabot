@@ -8,7 +8,7 @@ from discord.ext import commands
 import ehapi
 
 DISCORD_TOKEN = os.environ['DISCORD_TOKEN']
-description = "Grab E-Hentai metadata for E-Hentai links in the chat."
+description = "A discord bot which grabs E-Hentai metadata for E-Hentai links in the chat."
 bot = commands.Bot(command_prefix='!', description=description)
 
 G_CATEGORY = {"Doujinshi": "https://a.safe.moe/4JVyo.png",
