@@ -38,14 +38,6 @@ async def on_message(message):
     await bot.process_commands(message)
 
 
-# set topic for sadpanda server
-@bot.command(pass_context=True)
-async def topic(ctx, *, new_topic: str):
-    if ctx.message.server.id is "269723851389272065" or "253229838788198400":
-        if ctx.message.channel.permissions_for(ctx.message.server.me).manage_channels:
-            await bot.edit_channel(ctx.message.channel, topic=new_topic)
-
-
 # search for EH links and post their metadata
 async def parse_exlinks(message):
     galleries = ehapi.get_galleries(message.content)
@@ -127,3 +119,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
