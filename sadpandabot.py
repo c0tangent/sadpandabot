@@ -26,9 +26,7 @@ EH_COLOUR = discord.Colour(0x660611)
 
 @bot.event
 async def on_ready():
-    print("Logged in as")
-    print(bot.user.name)
-    print(bot.user.id)
+    print("Logged in as " + bot.user.name + " " + bot.user.id)
     print("------")
 
 
@@ -108,15 +106,15 @@ def create_ex_url(gid, g_token):
 
 # crude, but using Docker so ¯\_(ツ)_/¯
 def logger(message, contents):
-    print(message.author.name + " @ " + message.server.name + " @ " + str(message.timestamp))
+    print(message.author.name + " @ " + message.server.name)
     print(contents)
     print("------")
 
 
 def main():
+    print("Logging in...")
     bot.run(DISCORD_TOKEN)
 
 
 if __name__ == "__main__":
     main()
-
