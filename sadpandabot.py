@@ -11,16 +11,19 @@ DISCORD_TOKEN = os.environ['DISCORD_TOKEN']
 description = "A discord bot which grabs E-Hentai metadata for E-Hentai links in the chat."
 bot = commands.Bot(command_prefix='!', description=description)
 
-G_CATEGORY = {"Doujinshi": "https://a.safe.moe/4JVyo.png",
-              "Manga": "https://a.safe.moe/Uy5AH.png",
-              "Artist CG Sets": "https://a.safe.moe/GCLdI.png",
-              "Game CG Sets": "https://a.safe.moe/xbECu.png",
-              "Western": "https://a.safe.moe/JcGGo.png",
-              "Non-H": "https://a.safe.moe/wpqMe.png",
-              "Image Sets": "https://a.safe.moe/tjc3i.png",
-              "Cosplay": "https://a.safe.moe/NpzDp.png",
-              "Asian Porn": "https://a.safe.moe/Im78o.png",
-              "Misc": "https://a.safe.moe/X5Tb7.png"}
+BASE = "https://cdn.discordapp.com/attachments/306823976615936002/"
+G_CATEGORY = {
+    "Doujinshi": BASE + "471642768180117524/doujinshi.png",
+    "Manga": BASE + "471642771862716446/manga.png",
+    "Artist CG Sets": BASE + "471642764623478804/artistcg.png",
+    "Game CG Sets": BASE + "471642769169842176/gamecg.png",
+    "Western": BASE + "471642775964745729/western.png",
+    "Non-H": BASE + "471642774350069771/non-h.png",
+    "Image Sets": BASE + "471642770331926558/imageset.png",
+    "Cosplay": BASE + "471642766993260544/cosplay.png",
+    "Asian Porn": BASE + "471642765781106689/asianporn.png",
+    "Misc": BASE + "471642773087322112/misc.png"
+}
 EH_COLOUR = discord.Colour(0x660611)
 
 
@@ -67,6 +70,7 @@ def embed_full(exmeta):
     em.set_image(url=exmeta['thumb'])
     em.set_thumbnail(url=G_CATEGORY[exmeta['category']])
     em.set_footer(text=exmeta['filecount'] + " pages")
+    em.add_field(name="rating", value=exmeta['rating'])
     em = process_tags(em, exmeta['tags'])
     return em
 
@@ -106,7 +110,7 @@ def create_ex_url(gid, g_token):
 
 # crude, but using Docker so ¯\_(ツ)_/¯
 def logger(message, contents):
-    print(message.author.name + " @ " + message.server.name)
+    print(message.server.name)
     print(contents)
     print("------")
 
