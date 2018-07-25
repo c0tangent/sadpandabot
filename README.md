@@ -16,5 +16,5 @@ python3 sadpandabot.py
 ### docker
 
 ```
-docker run -e "DISCORD_TOKEN=<your discord token here>" cotangent/sadpandabot:0.3.3
+docker run -e "DISCORD_TOKEN=<your discord token here>" cotangent/sadpandabot:latest
 ```
