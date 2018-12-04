@@ -1,4 +1,5 @@
 asyncio
 requests
 beautifulsoup4
-discord.py
+git+git://github.com/Rapptz/discord.py@rewrite#egg=discord.py
+

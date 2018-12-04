@@ -29,7 +29,7 @@ EH_COLOUR = discord.Colour(0x660611)
 
 @bot.event
 async def on_ready():
-    print("Logged in as " + bot.user.name + " " + bot.user.id)
+    print("Logged in as " + bot.user.name + " " + str(bot.user.id))
     print("------")
 
 
@@ -45,10 +45,10 @@ async def parse_exlinks(message):
     if galleries:
         logger(message, ", ".join([gallery['token'] for gallery in galleries]))
         if len(galleries) > 5:  # don't spam chat too much if user spams links
-            await bot.send_message(message.channel, embed=embed_titles(galleries))
+            await message.channel.send(embed=embed_titles(galleries))
         else:
             for gallery in galleries:
-                await bot.send_message(message.channel, embed=embed_full(gallery))
+                await message.channel.send(embed=embed_full(gallery))
 
 
 # string of titles for lots of links
@@ -110,9 +110,7 @@ def create_ex_url(gid, g_token):
 
 # crude, but using Docker so ¯\_(ツ)_/¯
 def logger(message, contents):
-    print(message.server.name)
     print(contents)
-    print("------")
 
 
 def main():
