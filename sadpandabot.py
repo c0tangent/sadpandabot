@@ -15,11 +15,11 @@ BASE = "https://cdn.discordapp.com/attachments/306823976615936002/"
 G_CATEGORY = {
     "Doujinshi": BASE + "471642768180117524/doujinshi.png",
     "Manga": BASE + "471642771862716446/manga.png",
-    "Artist CG Sets": BASE + "471642764623478804/artistcg.png",
-    "Game CG Sets": BASE + "471642769169842176/gamecg.png",
+    "Artist CG": BASE + "471642764623478804/artistcg.png",
+    "Game CG": BASE + "471642769169842176/gamecg.png",
     "Western": BASE + "471642775964745729/western.png",
     "Non-H": BASE + "471642774350069771/non-h.png",
-    "Image Sets": BASE + "471642770331926558/imageset.png",
+    "Image Set": BASE + "471642770331926558/imageset.png",
     "Cosplay": BASE + "471642766993260544/cosplay.png",
     "Asian Porn": BASE + "471642765781106689/asianporn.png",
     "Misc": BASE + "471642773087322112/misc.png"
