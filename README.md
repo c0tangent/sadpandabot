@@ -20,3 +20,7 @@ python3 sadpandabot.py
 ```
 docker run -e "DISCORD_TOKEN=<your discord token here>" cotangent/sadpandabot:latest
 ```
+
+### administration
+
+There is a rudimentary administration interface provided via the [jishaku](https://github.com/Gorialis/jishaku) cog which exposes the [discord.py API](https://discordpy.readthedocs.io/en/rewrite/) to you. Command prefix is `s!` so to call `jishaku`, `s!jsk py await _ctx.send("hello world!")`.
