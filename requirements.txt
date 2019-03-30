@@ -2,4 +2,4 @@ asyncio
 requests
 beautifulsoup4
 git+git://github.com/Rapptz/discord.py@rewrite#egg=discord.py
-
+jishaku

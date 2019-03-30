@@ -4,12 +4,13 @@ import os
 import discord
 from bs4 import BeautifulSoup
 from discord.ext import commands
+import jishaku
 
 import ehapi
 
 DISCORD_TOKEN = os.environ['DISCORD_TOKEN']
 description = "A discord bot which grabs E-Hentai metadata for E-Hentai links in the chat."
-bot = commands.Bot(command_prefix='!', description=description)
+bot = commands.Bot(command_prefix='s!', description=description)
 
 BASE = "https://cdn.discordapp.com/attachments/306823976615936002/"
 G_CATEGORY = {
@@ -26,11 +27,18 @@ G_CATEGORY = {
 }
 EH_COLOUR = discord.Colour(0x660611)
 
+initial_extensions = ['jishaku']
 
 @bot.event
 async def on_ready():
     print("Logged in as " + bot.user.name + " " + str(bot.user.id))
     print("------")
+    for extension in initial_extensions:
+        try:
+            bot.load_extension(extension)
+        except Exception as e:
+            print(f'Failed to load extension {extension}.', file=sys.stderr)
+    print(f'Successfully logged in and booted...!')
 
 
 @bot.event
@@ -115,7 +123,7 @@ def logger(message, contents):
 
 def main():
     print("Logging in...")
-    bot.run(DISCORD_TOKEN)
+    bot.run(DISCORD_TOKEN, bot=True, reconnect=True)
 
 
 if __name__ == "__main__":
