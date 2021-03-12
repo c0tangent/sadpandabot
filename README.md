@@ -1,6 +1,6 @@
 # sadpandabot
 
-A discord bot which grabs E-Hentai metadata for E-Hentai links in the chat using discord.py. Get support and ask to add the bot to your guild [here](https://discord.gg/SWpwrtC).
+A discord bot which grabs E-Hentai metadata for E-Hentai links in the chat using discord.py. Get support [here](https://discord.gg/SWpwrtC). There probably isn't any invites for the bot instance I host due to the server limit for unverified accounts.
 
 ![bot preview screenshot](https://cloud.githubusercontent.com/assets/28670199/26400135/273b5526-40b2-11e7-9f8f-1254e4fde31d.png)
 
